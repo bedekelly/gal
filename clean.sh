@@ -1,4 +1,5 @@
-# Exit on any errors.
+#!/bin/bash
+
 set -e
 
 pyclean () {
