@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import json
 from io import BytesIO
 from base64 import b64encode
 from functools import lru_cache
@@ -15,6 +16,20 @@ app = Flask(__name__)
 
 def is_image(filename):
     return re.match("^.*\.(jpg|png|jpeg)$", filename)
+
+
+def file_cache(fn):
+
+    def cached_fn(*args, **kwargs):
+        try:
+            return json.loads(open("./.gal.cache").read())
+        except FileNotFoundError:
+            return_value = fn(*args, **kwargs)
+            with open("./.gal.cache", "w") as f:
+                f.write(json.dumps(return_value))
+            return return_value
+
+    return cached_fn
 
 
 def data_url(image_bytes):
@@ -36,7 +51,6 @@ def blurred(image):
     return image_output
 
 
-@lru_cache(1024)
 def preview_of(image, number, total):
     # It's important to thumbnail, *then* blur to keep things speedy!
     print(f" Image preview [{number+1}/{total}]")
@@ -51,6 +65,7 @@ def local_images():
     return [file for file in files if is_image(file)]
     
 
+@file_cache
 def generate_previews():
     images = local_images()
     total = len(images)
