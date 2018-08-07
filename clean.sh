@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 pyclean () {
 	find . -name "*~" -exec rm {} \; && find . -name "*.pyc" -exec rm {} \; && find . -name "__pycache__" -exec rm -r {} \; 2> /dev/null
 	true
